@@ -1,6 +1,8 @@
+#ifndef _INTERPRETER_H_
+#define _INTERPRETER_H_
+
 #include <stdlib.h>
 #include <tcl.h>
-#include <tk.h>
 
 typedef struct {
 	int go_interp; // go tcl/tk interpreter handle, that's a global handle
@@ -32,3 +34,5 @@ typedef struct {
 } GoTkAsyncEvent;
 
 Tcl_Event *_gotk_c_new_async_event(int go_interp);
+
+#endif
