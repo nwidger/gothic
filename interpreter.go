@@ -719,3 +719,22 @@ func (ir *interpreter) run_and_wait(action func() error) (err error) {
 
 	return
 }
+
+//export _gotk_go_async_handler
+func _gotk_go_async_handler(ev unsafe.Pointer, flags C.int) C.int {
+	if flags != C.TCL_ALL_EVENTS {
+		return 0
+	}
+	event := (*C.GoTkAsyncEvent)(ev)
+	ir := global_handles.get(int(event.go_interp)).(*interpreter)
+	action := <-ir.queue
+	if action.result == nil {
+		action.action()
+	} else {
+		*action.result = action.action()
+	}
+	action.cond.L.Lock()
+	action.cond.Signal()
+	action.cond.L.Unlock()
+	return 1
+}
